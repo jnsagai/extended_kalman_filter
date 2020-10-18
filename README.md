@@ -1,11 +1,16 @@
-# Extended Kalman Filter Project Starter Code
+[//]: # (Image References)
+[image1]: ./img/Setup.PNG "Setup"
+[image2]: ./img/Dataset_1.PNG "Dataset 1"
+[image3]: ./img/Dataset_2.PNG "Dataset 2"
+
+# Extended Kalman Filter
 Self-Driving Car Engineer Nanodegree Program
 
-In this project you will utilize a kalman filter to estimate the state of a moving object of interest with noisy lidar and radar measurements. Passing the project requires obtaining RMSE values that are lower than the tolerance outlined in the project rubric. 
+This project utilize a kalman filter to estimate the state of a moving object of interest with noisy lidar and radar measurements.
 
-This project involves the Term 2 Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases).
+This project involves Udacity Simulator which can be downloaded [here](https://github.com/udacity/self-driving-car-sim/releases).
 
-This repository includes two files that can be used to set up and install [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO. Please see the uWebSocketIO Starter Guide page in the classroom within the EKF Project lesson for the required version and installation scripts.
+This repository includes two files that can be used to set up and install [uWebSocketIO](https://github.com/uWebSockets/uWebSockets) for either Linux or Mac systems. For windows you can use either Docker, VMware, or even [Windows 10 Bash on Ubuntu](https://www.howtogeek.com/249966/how-to-install-and-use-the-linux-bash-shell-on-windows-10/) to install uWebSocketIO.
 
 Once the install for uWebSocketIO is complete, the main program can be built and run by doing the following from the project top directory.
 
@@ -15,19 +20,9 @@ Once the install for uWebSocketIO is complete, the main program can be built and
 4. make
 5. ./ExtendedKF
 
-Tips for setting up your environment can be found in the classroom lesson for this project.
-
-Note that the programs that need to be written to accomplish the project are src/FusionEKF.cpp, src/FusionEKF.h, kalman_filter.cpp, kalman_filter.h, tools.cpp, and tools.h
-
-The program main.cpp has already been filled out, but feel free to modify it.
-
-Here is the main protocol that main.cpp uses for uWebSocketIO in communicating with the simulator.
-
-
 **INPUT**: values provided by the simulator to the c++ program
 
 ["sensor_measurement"] => the measurement that the simulator observed (either lidar or radar)
-
 
 **OUTPUT**: values provided by the c++ program to the simulator
 
@@ -42,6 +37,10 @@ Here is the main protocol that main.cpp uses for uWebSocketIO in communicating w
 ["rmse_vx"]
 
 ["rmse_vy"]
+
+## Simulator
+
+In the Simulator, Lidar measurements are red circles, radar measurements are blue circles with an arrow pointing in the direction of the observed angle, and estimation markers are green triangles. The simulator provides the script the measured data (either lidar or radar), and the script feeds back the measured estimation marker, and RMSE values from its Kalman filter.
 
 ---
 
@@ -66,16 +65,19 @@ Here is the main protocol that main.cpp uses for uWebSocketIO in communicating w
    * On windows, you may need to run: `cmake .. -G "Unix Makefiles" && make`
 4. Run it: `./ExtendedKF `
 
-## Editor Settings
+## Running the Filter
 
-We've purposefully kept editor configuration files out of this repo in order to
-keep it as simple and environment agnostic as possible. However, we recommend
-using the following settings:
+1. Start the Simulator and select the first project
+2. From the build directory, run the Extended Kalman Filter program: `./ExtendedKF `
+3. Select the dataset in the Simulator and click "Start":
 
-* indent using spaces
-* set tab width to 2 spaces (keeps the matrices in source code aligned)
+![alt text][image1]
 
-## Code Style
+4. If the Filter is working fine, it is expected to achieve a final RMSE (Root Mean Square Error) of [.11, .11, 0.52, 0.52] for px, py, vx and vy.
+5. Here an example of the first Dataset, where the LIDAR data is sent first:
 
-Please (do your best to) stick to [Google's C++ style guide](https://google.github.io/styleguide/cppguide.html).
+![alt text][image2]
 
+6. And here an example of the second Dataset, where the RADAR data is sent first:
+
+![alt text][image3]
