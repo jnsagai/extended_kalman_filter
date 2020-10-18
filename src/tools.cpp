@@ -68,29 +68,28 @@ MatrixXd Tools::CalculateJacobian(const VectorXd& x_state) {
   MatrixXd Hj(3, 4);
 
   // Recover the  state parameters
-  float px = x_state(0);
-  float py = x_state(1);
-  float vx = x_state(2);
-  float vy = x_state(3);
+  double px = x_state(0);
+  double py = x_state(1);
+  double vx = x_state(2);
+  double vy = x_state(3);
 
+  // Preprocess somve values
+  double c1 = px*px+py*py;
+  double c2 = sqrt(c1);
+  double c3 = (c1*c2);
+  
   // Safe check for division by zero
   Hj = MatrixXd::Zero(3, 4);
-  if (px == 0 && py == 0)
+  if (fabs(c1) < 0.0001)
   {
      std::cout << "CalculateJacobian - Error - Division by Zero" << std::endl;
   }
   else
   {
-     // Preprocess sum square of px and py
-     float sum_square = pow(px, 2) + pow(py, 2);
-
-     Hj(0, 0) = px / (sqrt(sum_square));
-     Hj(0, 1) = py / (sqrt(sum_square));
-     Hj(1, 0) = -(py / sum_square);
-     Hj(1, 1) = px / sum_square;
-     Hj(2, 0) = (py * (vx * py - vy * px)) / pow(sum_square, 3 / 2);
-     Hj(2, 1) = (px * (vy * px - vx * py)) / pow(sum_square, 3 / 2);
-     Hj(2, 2) = px / sqrt(sum_square);
-     Hj(2, 3) = py / sqrt(sum_square);     
+     //compute the Jacobian matrix
+     Hj << (px/c2), (py/c2), 0, 0,
+           -(py/c1), (px/c1), 0, 0,
+            py*(vx*py - vy*px)/c3, px*(px*vy - py*vx)/c3, px/c2, py/c2;   
   }
+  return Hj;
 }

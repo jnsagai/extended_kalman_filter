@@ -1,6 +1,7 @@
 #include "kalman_filter.h"
 #include "tools.h"
 #include <cmath>
+#include <iostream>
 
 using Eigen::MatrixXd;
 using Eigen::VectorXd;
@@ -30,7 +31,8 @@ void KalmanFilter::Predict() {
    */
   x_ = F_ * x_;
   MatrixXd Ft = F_.transpose();
-  P_ = F_ * P_ * Ft * Q_;
+  P_ = F_ * P_ * Ft + Q_;
+  std::cout << "P: " << P_ << std::endl;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
@@ -47,10 +49,10 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
    * Update the state by using Extended Kalman Filter equations
    */
   // Create the function h(x') as the prediction z_pred
-  float px = x_(0);
-  float py = x_(1);
-  float vx = x_(2);
-  float vy = x_(3);
+  double px = x_(0);
+  double py = x_(1);
+  double vx = x_(2);
+  double vy = x_(3);
 
   VectorXd z_pred(3);
   VectorXd y(3);
@@ -61,15 +63,16 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   else
   {      
     z_pred(0) = sqrt(pow(px, 2) + pow(py, 2));
-    z_pred(1) = atan2(py / px);
+    z_pred(1) = atan2(py, px);
     z_pred(2) = (px * vx + py * vy) / sqrt(pow(px, 2) + pow(py, 2));
 
     y = z - z_pred;
 
     // Normalize the angle between -pi and pi
-    angle = y(1);
-    while ( !(angle >= M_PI && angle <= M_PI) )
+    double angle = y(1);
+    while ( angle < -M_PI || angle > M_PI )
     {
+      std::cout << "Angle: " << angle << std::endl;
       if ( angle < M_PI )
         angle += M_PI;
       else
