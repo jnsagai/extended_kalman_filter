@@ -1,6 +1,5 @@
 #include "kalman_filter.h"
 #include "tools.h"
-#include <cmath>
 #include <iostream>
 
 using Eigen::MatrixXd;
@@ -85,7 +84,7 @@ void KalmanFilter::CalculateNewState(const Eigen::VectorXd &y) {
   MatrixXd S = H_ * P_ * Ht + R_;
   MatrixXd Si = S.inverse();
   MatrixXd K =  P_ * Ht * Si;
-  
+
   // New state
   x_ = x_ + (K * y);
   long x_size = x_.size();

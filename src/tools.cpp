@@ -24,7 +24,6 @@ VectorXd Tools::CalculateRMSE(const vector<VectorXd> &estimations,
   {
      std::cout << "CalculareRMSE - Error - Estimation vector size is zero" << std::endl;
   }
-
   // The estimation vector size should equal ground truth vector size
   else if (estimations.size() != ground_truth.size())
   {
