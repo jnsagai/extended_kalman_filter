@@ -29,18 +29,16 @@ void KalmanFilter::Predict() {
   /**
    * Predict the state
    */
-  x_ = F_ * x_;
+  x_ = F_ * x_ ;
   MatrixXd Ft = F_.transpose();
   P_ = F_ * P_ * Ft + Q_;
-  std::cout << "P: " << P_ << std::endl;
 }
 
 void KalmanFilter::Update(const VectorXd &z) {
   /**
    * Update the state by using Kalman Filter equations
    */
-	VectorXd z_pred = H_ * x_;
-	VectorXd y = z - z_pred;
+  VectorXd y = z - H_ * x_;
   CalculateNewState(y);
 }
 
@@ -54,31 +52,29 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
   double vx = x_(2);
   double vy = x_(3);
 
-  VectorXd z_pred(3);
-  VectorXd y(3);
-  if (px == 0 && py == 0)
+  VectorXd h = VectorXd(3);
+  VectorXd y = VectorXd(3);
+  if (fabs(px) <= 0.000001 && fabs(py) <= 0.000001)
   {
      std::cout << "UpdateEKF - Error - Division by Zero" << std::endl;
   }
   else
-  {      
-    z_pred(0) = sqrt(pow(px, 2) + pow(py, 2));
-    z_pred(1) = atan2(py, px);
-    z_pred(2) = (px * vx + py * vy) / sqrt(pow(px, 2) + pow(py, 2));
+  {
+    double rho = sqrt(px*px + py*py);
+    double theta = atan2(py, px);
+    double rho_dot = (px*vx + py*vy) / rho;
 
-    y = z - z_pred;
+    h << rho, theta, rho_dot;
+    y = z - h;
 
     // Normalize the angle between -pi and pi
-    double angle = y(1);
-    while ( angle < -M_PI || angle > M_PI )
+    while ( y(1) < -M_PI || y(1) > M_PI )
     {
-      std::cout << "Angle: " << angle << std::endl;
-      if ( angle < M_PI )
-        angle += M_PI;
+      if ( y(1) < -M_PI )
+        y(1) += 2 * M_PI;
       else
-        angle -= M_PI;
+        y(1) -= 2 * M_PI;
     }
-    y(1) = angle;
   }
   CalculateNewState(y);
 }
@@ -86,14 +82,13 @@ void KalmanFilter::UpdateEKF(const VectorXd &z) {
 void KalmanFilter::CalculateNewState(const Eigen::VectorXd &y) {
   
   MatrixXd Ht = H_.transpose();
-	MatrixXd S = H_ * P_ * Ht + R_;
-	MatrixXd Si = S.inverse();
-	MatrixXd PHt = P_ * Ht;
-	MatrixXd K = PHt * Si;
-
-	//new estimate
-	x_ = x_ + (K * y);
-	long x_size = x_.size();
-	MatrixXd I = MatrixXd::Identity(x_size, x_size);
-	P_ = (I - K * H_) * P_;
+  MatrixXd S = H_ * P_ * Ht + R_;
+  MatrixXd Si = S.inverse();
+  MatrixXd K =  P_ * Ht * Si;
+  
+  // New state
+  x_ = x_ + (K * y);
+  long x_size = x_.size();
+  MatrixXd I = MatrixXd::Identity(x_size, x_size);
+  P_ = (I - K * H_) * P_;
 }
